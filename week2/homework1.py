@@ -20,7 +20,7 @@ class Documents:
             self.stopwords_list = f.read().split('\n')
         if ('\n' not in self.stopwords_list):
             self.stopwords_list.append('\n')
-        # print(self.stopwords_list)
+        print(self.stopwords_list)
 
     def getDocuments(self):
         for doc in self.document_list:
@@ -120,13 +120,13 @@ class Documents:
 
 def main():
     d = Documents()
-    d.wordSplitting()
-    d.filtering()
-    d.calculating()
-    d.getFeatures(100)
-    d.vectorization()
-    d.getGravityCenter()
-    d.getWordloud()
+    # d.wordSplitting()
+    # d.filtering()
+    # d.calculating()
+    # d.getFeatures(100)
+    # d.vectorization()
+    # d.getGravityCenter()
+    # d.getWordloud()
 
 
 if __name__ == '__main__':
