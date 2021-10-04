@@ -1,53 +1,90 @@
 import jieba
 import numpy as np
+import re
 
 
-def clean():
+def load_data(path, mode=0):
     """
-    本函数进行微博语句的分词，同时清洗分词数据
-
-    :return:
-    返回过滤后的分词情况
+    加载本地数据，只读取txt文本
+    :param path: 文件相对位置
+    :param mode: 加载文件的模式，0表示正常按行读取，1表示读取后的结果每条去掉末尾的换行符
+    :return: 数据列表
     """
-    def init(weibolist, stopwordslist):
-        # 读取微博数据
-        with open("weibo.txt", 'r', encoding='utf-8') as f:
-            weibolist += f.readlines()
-        # 加载情绪词典
-        jieba.load_userdict("emotion dict\\anger.txt")
-        jieba.load_userdict("emotion dict\\disgust.txt")
-        jieba.load_userdict("emotion dict\\fear.txt")
-        jieba.load_userdict("emotion dict\\joy.txt")
-        jieba.load_userdict("emotion dict\\sadness.txt")
-        # 加载停用词表
-        with open("stopwords.txt", "r", encoding='utf-8') as f:
-            stopwordslist += f.read().split()
-        if " " not in stopwordslist:
-            stopwordslist += [' ']
-        if "\n" not in stopwordslist:
-            stopwordslist += ['\n']
-        if "\t" not in stopwordslist:
-            stopwordslist += ['\t']
+    with open(path, 'r', encoding='utf-8') as f:
+        if mode == 0:
+            data = f.readlines()
+        elif mode == 1:
+            data = f.read().split()
+        else:
+            raise Exception('Error mode')
+    return data
 
-    def cutting(sentence):
-        return jieba.lcut(sentence)
+
+
+def clean(wb_data, sw_data):
+    """
+    本函数进行微博语句的清洗
+    :param wb_data: 微博分词数据
+    :param sw_data: 停用词表
+    :return:返回清洗后的分词情况
+    """
+
+    def cutting(wb_data):
+        """
+        将微博数据进行分词
+        :param wb_data: 微博元数据
+        :return: 分词后的二维列表
+        """
+
+        def init():
+            # 加载情绪词典
+            jieba.load_userdict("emotion dict\\anger.txt")
+            jieba.load_userdict("emotion dict\\disgust.txt")
+            jieba.load_userdict("emotion dict\\fear.txt")
+            jieba.load_userdict("emotion dict\\joy.txt")
+            jieba.load_userdict("emotion dict\\sadness.txt")
+
+        init()
+        split_list = []
+        for wb in wb_data:
+            split_list += [jieba.lcut(wb)]
+        return split_list
+
+    def remove_urls(wb_data):
+        """
+        去除微博文本中的URL
+        :param wb_data: 微博元数据
+        :return: 去除url后的微博数据
+        """
+        temp = []
+        for wb in wb_data:
+            try:
+                end_index = re.search(r'https?://([\w-]+\.)+[\w-]+(/[\w./?%&=]*)?', wb).span()[0]  # 找到url的起始位置
+                temp.append(wb[:end_index])
+            except AttributeError:
+                temp.append(wb)
+        return temp
 
     def filtering(wordlist):
+        """
+        过滤停用词
+        :param wordlist: 一条微博的分词列表
+        :return: 过滤停用词后的分词列表
+        """
         temp = []
         for i in wordlist:
             if i not in stopwords_list:
                 temp += [i]
+        # print(temp)
         return temp
 
     # 初始化数据结构
     split_list_filtered = []
-    weibo_list = []
-    stopwords_list = []
-    init(weibo_list, stopwords_list)
-    # print(weibo_list, stopwords_list)
-    for i in weibo_list:
-        x = cutting(i)
-        y = filtering(x)
+    stopwords_list = sw_data
+    wb_no_urls = remove_urls(wb_data)
+    split_list = cutting(wb_no_urls)
+    for i in split_list:
+        y = filtering(i)
         split_list_filtered += [y]
     # print(split_list_filtered)
     return split_list_filtered
@@ -60,8 +97,7 @@ def emotion_analysing(wordlist, method):
     传入分词后的结果以及使用的情感分析方法，其中每条微博分词后的结果应该是一维列表，method分为"vector"和"value"，对应返回的是情绪值还是情绪向量
     其中在外层函数传入method控制使用的内层函数，在内层函数传入分词结果
 
-    :return:
-    emotion: 情感分析结果
+    :return:情感分析结果
     """
     with open("emotion dict\\anger.txt", "r", encoding='utf-8') as a:
         x = a.read().split()
@@ -138,10 +174,32 @@ def emotion_analysing(wordlist, method):
         return value
 
 
+def emotion_timemode(wordlist, mode):
+    """
+    传入分词词表并制定返回模式，返回对应情绪的指定模式
+
+    :param wordlist:
+    :param mode: 控制返回的模式，包括小时、天、周等
+    :return: 对应情绪的指定模式
+    """
+
+
 def main():
-    splitwords = clean()
-    ea = emotion_analysing(splitwords[0], method='vector')
-    print(ea())
+    wb_data = load_data('weibo.txt')
+
+    sw_data = load_data('stopwords.txt', 1)
+    if " " not in sw_data:
+        sw_data += [' ']
+    if "\n" not in sw_data:
+        sw_data += ['\n']
+    if "\t" not in sw_data:
+        sw_data += ['\t']
+
+    filteredwords = clean(wb_data, sw_data)
+    # print(filteredwords == splitwords)
+    # print(filteredwords)
+    # ea = emotion_analysing(filteredwords[0], method='vector')
+
 
 
 if __name__ == "__main__":
