@@ -1,5 +1,4 @@
 import jieba
-import numpy as np
 import re
 
 
@@ -7,7 +6,7 @@ def load_data(path, mode=0):
     """
     加载本地数据，只读取txt文本
     :param path: 文件相对位置
-    :param mode: 加载文件的模式，0表示正常按行读取，1表示读取后的结果每条去掉末尾的换行符
+    :param mode: 加载文件的模式，0表示正常按行读取，1表示读取后的结果每条去掉末尾的换行符，2表示读取为1类型且值为1的字典
     :return: 数据列表
     """
     with open(path, 'r', encoding='utf-8') as f:
@@ -15,6 +14,10 @@ def load_data(path, mode=0):
             data = f.readlines()
         elif mode == 1:
             data = f.read().split()
+        elif mode == 2:
+            data1 = f.read().split()
+            lis = [1 for i in range(len(data1))]
+            data = dict(zip(data1, lis))
         else:
             raise Exception('Error mode')
     return data
@@ -90,47 +93,29 @@ def clean(wb_data, sw_data):
     return split_list_filtered
 
 
-def emotion_analysing(wordlist, method):
+def emotion_analysing(method):
     """
-    进行情感分析
-
-    传入分词后的结果以及使用的情感分析方法，其中每条微博分词后的结果应该是一维列表，method分为"vector"和"value"，对应返回的是情绪值还是情绪向量
+    进行情感分析，传入分词后的结果以及使用的情感分析方法，其中每条微博分词后的结果应该是一维列表，
+    :param method: method分为"vector"和"value"，对应返回的是情绪值还是情绪向量
     其中在外层函数传入method控制使用的内层函数，在内层函数传入分词结果
-
     :return:情感分析结果
     """
-    with open("emotion dict\\anger.txt", "r", encoding='utf-8') as a:
-        x = a.read().split()
-        y = [1 for i in range(len(x))]
-        anger_dict = dict(zip(x, y))
-    with open("emotion dict\\disgust.txt", "r", encoding='utf-8') as a:
-        x = a.read().split()
-        y = [1 for i in range(len(x))]
-        disgust_dict = dict(zip(x, y))
-    with open("emotion dict\\fear.txt", "r", encoding='utf-8') as a:
-        x = a.read().split()
-        y = [1 for i in range(len(x))]
-        fear_dict = dict(zip(x, y))
-    with open("emotion dict\\joy.txt", "r", encoding='utf-8') as a:
-        x = a.read().split()
-        y = [1 for i in range(len(x))]
-        joy_dict = dict(zip(x, y))
-    with open("emotion dict\\sadness.txt", "r", encoding='utf-8') as a:
-        x = a.read().split()
-        y = [1 for i in range(len(x))]
-        sadness_dict = dict(zip(x, y))
+    anger_dict = load_data("emotion dict\\anger.txt", 2)
+    disgust_dict = load_data("emotion dict\\disgust.txt", 2)
+    fear_dict = load_data("emotion dict\\fear.txt", 2)
+    joy_dict = load_data("emotion dict\\joy.txt", 2)
+    sadness_dict = load_data("emotion dict\\sadness.txt", 2)
     # print(anger_dict)
 
-    def vector():
+    def vector(wordlist):
         """
         返回情绪向量的方法，情绪向量的构成为 (anger, disgust, fear, joy, sadness)
 
         :return: 返回情绪向量，表示每个情绪词的个数比例
         """
-        nonlocal wordlist
-        num_vec = np.zeros(5)
+        num_vec = [0 for i in range(5)]
         for word in wordlist:
-            print(word)
+            # print(word)
             if word in anger_dict:
                 num_vec[0] += anger_dict[word]
             elif word in disgust_dict:
@@ -141,32 +126,32 @@ def emotion_analysing(wordlist, method):
                 num_vec[3] += joy_dict[word]
             elif word in sadness_dict:
                 num_vec[4] += sadness_dict[word]
-        num_total = np.sum(num_vec)
+        num_total = sum(num_vec)
         if num_total == 0:
             res = num_vec
         else:
-            res = num_vec / num_total
+            res = [(i/num_total) for i in num_vec]
         return res
 
-    def value():
+    def value(wordlist):
         """
         返回情绪值（字符串）的方法，情绪向量的构成为 (anger, disgust, fear, joy, sadness)
 
         :return: 返回情绪向量，表示每个情绪词的个数比例
         """
-        nonlocal wordlist
-        rate_vec = vector()
+        rate_vec = vector(wordlist)
+        em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
+        em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
         if max(rate_vec) == min(rate_vec):
-            # 最大和最小相同（已经包括全是0的情况），表示无情绪
-            res = '无情绪'
-        else:  # 还有情绪冲突的情况未处理
-            pass
-
-    # def vector():
-    #     pass
-    #
-    # def value():
-    #     pass
+            # 最大和最小相同（已经包括全是0的情况），表示无显著情绪
+            res = (em_flag[2], -1)
+        elif rate_vec.count(max(rate_vec)) >1 :
+            # 出现重复的最大值时，混合情绪
+            res = (em_flag[1], -1)
+        else:
+            # 有独立最大值，单一情绪
+            res = (em_flag[0], em_tag[rate_vec.index(max(rate_vec))])
+        return res
 
     if method == 'vector':
         return vector
@@ -174,11 +159,30 @@ def emotion_analysing(wordlist, method):
         return value
 
 
-def emotion_timemode(wordlist, mode):
+def emotion_tagging(wb_data, method):
+    """
+    给每条微博数据进行情绪标记
+    :param wb_data: 微博数据列表
+    :param method: 采用的情绪判定方法，'vector'或'value'
+    :return: 返回情绪标记列表
+    """
+    res = []
+    em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
+    # em_flag_cot = [0 for i in range(len(em_flag))]  # flag计数器
+    em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
+    # em_tag_cot = [0 for i in range(len(em_tag))]
+    em_tagging = emotion_analysing(method)
+    for i in wb_data:
+        tag = em_tagging(i)
+        res.append(tag)
+    return res
+
+
+def emotion_timemode(wb_data, mode):
     """
     传入分词词表并制定返回模式，返回对应情绪的指定模式
 
-    :param wordlist:
+    :param wb_data:
     :param mode: 控制返回的模式，包括小时、天、周等
     :return: 对应情绪的指定模式
     """
@@ -198,8 +202,9 @@ def main():
     filteredwords = clean(wb_data, sw_data)
     # print(filteredwords == splitwords)
     # print(filteredwords)
-    # ea = emotion_analysing(filteredwords[0], method='vector')
-
+    wb_value_tag = emotion_tagging(wb_data, 'value')
+    wb_vector_tag = emotion_tagging(wb_data, 'vector')
+    print(wb_vector_tag)
 
 
 if __name__ == "__main__":
