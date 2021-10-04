@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6fc6bc87-5488-44e6-86c4-e08d11469d0e" name="更改" comment="配置文件更新">
+    <list default="true" id="6fc6bc87-5488-44e6-86c4-e08d11469d0e" name="更改" comment="修改emotion_analysing，完成value方法&#10;增加emotion_tagging,emotion_timemode">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/19377407-丁旭东-homework2.md" beforeDir="false" afterPath="$PROJECT_DIR$/19377407-丁旭东-homework2.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -89,7 +89,7 @@
       <workItem from="1633248298064" duration="1133000" />
       <workItem from="1633249920210" duration="10735000" />
       <workItem from="1633271773525" duration="1719000" />
-      <workItem from="1633311195501" duration="9214000" />
+      <workItem from="1633311195501" duration="26922000" />
     </task>
     <task id="LOCAL-00001" summary="week3 init">
       <created>1633227874881</created>
@@ -168,7 +168,21 @@
       <option name="project" value="LOCAL" />
       <updated>1633327492802</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="配置文件更新">
+      <created>1633328230233</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1633328230233</updated>
+    </task>
+    <task id="LOCAL-00013" summary="修改emotion_analysing，完成value方法&#10;增加emotion_tagging,emotion_timemode">
+      <created>1633335520131</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1633335520131</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -194,9 +208,10 @@
     <MESSAGE value="week3 完成clean和emotion_analysing的vector方法" />
     <MESSAGE value="增加load模块和remove_urls模块，重写clean模块" />
     <MESSAGE value="配置文件更新" />
-    <option name="LAST_COMMIT_MESSAGE" value="配置文件更新" />
+    <MESSAGE value="修改emotion_analysing，完成value方法&#10;增加emotion_tagging,emotion_timemode" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改emotion_analysing，完成value方法&#10;增加emotion_tagging,emotion_timemode" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/week3$main.coverage" NAME="main 覆盖结果" MODIFIED="1633326765350" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/week3$main.coverage" NAME="main 覆盖结果" MODIFIED="1633351744141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
