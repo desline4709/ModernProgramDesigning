@@ -89,7 +89,7 @@
       <workItem from="1633248298064" duration="1133000" />
       <workItem from="1633249920210" duration="10735000" />
       <workItem from="1633271773525" duration="1719000" />
-      <workItem from="1633311195501" duration="8361000" />
+      <workItem from="1633311195501" duration="9214000" />
     </task>
     <task id="LOCAL-00001" summary="week3 init">
       <created>1633227874881</created>
@@ -154,7 +154,21 @@
       <option name="project" value="LOCAL" />
       <updated>1633311332657</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="增加load模块和remove_urls模块，重写clean模块">
+      <created>1633327473366</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1633327473366</updated>
+    </task>
+    <task id="LOCAL-00011" summary="配置文件更新">
+      <created>1633327492802</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1633327492802</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,6 +192,7 @@
     <MESSAGE value="add emotion dict and stopwords" />
     <MESSAGE value="week3 add clean() and emotion_analysing()" />
     <MESSAGE value="week3 完成clean和emotion_analysing的vector方法" />
+    <MESSAGE value="增加load模块和remove_urls模块，重写clean模块" />
     <MESSAGE value="配置文件更新" />
     <option name="LAST_COMMIT_MESSAGE" value="配置文件更新" />
   </component>
