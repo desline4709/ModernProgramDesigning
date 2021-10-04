@@ -1,5 +1,7 @@
 import jieba
 import re
+import numpy as np
+import time
 
 
 def load_data(path, mode=0):
@@ -167,10 +169,6 @@ def emotion_tagging(wb_data, method):
     :return: 返回情绪标记列表
     """
     res = []
-    em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
-    # em_flag_cot = [0 for i in range(len(em_flag))]  # flag计数器
-    em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
-    # em_tag_cot = [0 for i in range(len(em_tag))]
     em_tagging = emotion_analysing(method)
     for i in wb_data:
         tag = em_tagging(i)
@@ -178,14 +176,87 @@ def emotion_tagging(wb_data, method):
     return res
 
 
-def emotion_timemode(wb_data, mode):
+def extract_time(wb_data):
     """
-    传入分词词表并制定返回模式，返回对应情绪的指定模式
+    提取时间信息
+    :param wb_data: 微博元数据
+    :return: 时间戳的列表
+    """
+    timetick_list = []
+    re_str = '(?P<week>\w{3}) (?P<mon>\w{3}) (?P<day>\d+) (?P<time>\d+:\d+:\d+) (?P<zone>\+\d+) (?P<year>\d{4})'
+    for wb in wb_data:
+        totaltime_str = re.search(re_str, wb)
+        timetick_list.append(time.mktime(time.strptime(totaltime_str.group(),"%a %b %d %H:%M:%S %z %Y")))
+    return timetick_list
 
-    :param wb_data:
-    :param mode: 控制返回的模式，包括小时、天、周等
+
+def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
+    """
+    传入标签列表并制定返回模式，返回对应情绪的指定模式，经分析，微博数据时间分布从2013.10.11零点-2013.10.13零点共两天的时间
+    :param wbemo_tag:微博情绪标签列表
+    :param mood: 情绪
+    :param timemode: 控制返回的模式，包括小时(hour--0)、固定时段(fixed--1)、天(day--2)等
+    :param method: 指定计量情绪的方法，'vector' 或 'value'
     :return: 对应情绪的指定模式
     """
+    start_str = '2013 Oct 11 00:00:00'  # 开始时间
+    end_str = '2013 Oct 13 01:00:00'  # 结束时间
+    start_tick = time.mktime(time.strptime(start_str, "%Y %b %d %X"))  # 转换为时间戳
+    end_tick = time.mktime(time.strptime(end_str, "%Y %b %d %X"))
+    hour_num = int((end_tick - start_tick) // 3600)  # 一共几个小时
+    em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
+    em_flag_cot = [0 for i in range(len(em_flag))]  # flag计数器
+    em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
+    em_tag_cot = [0 for i in range(len(em_tag))]
+    em_flag_cot_arr = [np.zeros(len(em_flag) * hour_num).reshape((hour_num, len(em_flag))),
+                       np.zeros(len(em_flag) * 24).reshape((24, len(em_flag))),
+                       np.zeros(len(em_flag) * 3).reshape((3, len(em_flag)))]  # 分别代表3种模式的计数器，3维数组
+    em_tag_cot_arr = [np.zeros(len(em_tag) * 49).reshape((49, len(em_tag))),
+                       np.zeros(len(em_tag) * 24).reshape((24, len(em_tag))),
+                       np.zeros(len(em_tag) * 3).reshape((3, len(em_tag)))]
+    em_vecnum_arr = [np.zeros(hour_num), np.zeros(24), np.zeros(3)]  # 每个模式下对应向量的计数器
+
+    def vector():
+        nonlocal em_tag_cot, em_flag_cot
+        for i in range(len(wbemo_tag)):
+            # vector计量情绪，只有情绪比例;wbemo_tag是二维列表
+            em_tag_cot += np.array(i)
+            try:
+                if timemode == 0:
+                    time_index = int((time_list[i] - start_tick) //3600)
+                elif timemode == 1:
+                    time_index = eval(time.strftime("%H", time.localtime(time_list[i])))
+                elif timemode == 2:
+                    time_index = int((time_list[i] - start_tick) // (3600*24))
+                em_tag_cot_arr[timemode][time_index] += np.array(wbemo_tag[i])
+                em_vecnum_arr[timemode][time_index] += 1
+            except NameError:
+                raise Exception('No time_index')
+            except IndexError:
+                raise Exception('Wrong index')
+        em_tag_cot = np.array(em_tag_cot)/len(em_tag_cot)  # 总的情绪比例
+        # print(em_tag_cot_arr[timemode][48])
+        # print(np.sum(em_vecnum_arr[timemode]))
+        try:
+            if timemode == 0:
+                num_of_index = hour_num
+            elif timemode == 1:
+                num_of_index = 24
+            elif timemode == 2:
+                num_of_index = 3
+            for hour in range(num_of_index):
+                em_tag_cot_arr[timemode][hour] /= em_vecnum_arr[timemode][hour]
+        except:
+            raise Exception('No num_of_index')
+        return em_tag_cot_arr[timemode]
+
+    def value():
+        pass
+
+    if method == 'vector':
+        return vector
+    elif method == 'value':
+        value()
 
 
 def main():
@@ -204,7 +275,10 @@ def main():
     # print(filteredwords)
     wb_value_tag = emotion_tagging(wb_data, 'value')
     wb_vector_tag = emotion_tagging(wb_data, 'vector')
-    print(wb_vector_tag)
+
+    time_list = extract_time(wb_data)
+    wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'joy', 0, 'vector')()
+    print(wb_vector_hour_res)
 
 
 if __name__ == "__main__":
