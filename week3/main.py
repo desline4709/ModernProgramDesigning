@@ -25,7 +25,6 @@ def load_data(path, mode=0):
     return data
 
 
-
 def clean(wb_data, sw_data):
     """
     本函数进行微博语句的清洗
@@ -194,7 +193,7 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
     """
     传入标签列表并制定返回模式，返回对应情绪的指定模式，经分析，微博数据时间分布从2013.10.11零点-2013.10.13零点共两天的时间
     :param wbemo_tag:微博情绪标签列表
-    :param mood: 情绪
+    :param mood: 情绪，包括 'angry', 'disgusting', 'fear', 'joy', 'sad', 'all'（输出所有的情绪比例变化趋势）
     :param timemode: 控制返回的模式，包括小时(hour--0)、固定时段(fixed--1)、天(day--2)等
     :param method: 指定计量情绪的方法，'vector' 或 'value'
     :return: 对应情绪的指定模式
@@ -248,11 +247,18 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
                 num_of_index = 24
             elif timemode == 2:
                 num_of_index = 3
+            res = []
             for hour in range(num_of_index):
                 em_tag_cot_arr[timemode][hour] /= em_vecnum_arr[timemode][hour]
+                if mood != 'all':
+                    tag_index = em_tag.index(mood)
+                    res.append(em_tag_cot_arr[timemode][hour][tag_index])
+                else:
+                    res.append(em_tag_cot_arr[timemode][hour])
         except:
             raise Exception('No num_of_index')
-        return em_tag_cot, em_tag_cot_arr[timemode]
+
+        return em_tag_cot, res
 
     def value():
         nonlocal em_tag_cot, em_flag_cot, em_tagnum
@@ -288,16 +294,38 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
                 num_of_index = 24
             elif timemode == 2:
                 num_of_index = 3
+            res = []
             for hour in range(num_of_index):
                 em_tag_cot_arr[timemode][hour] /= np.sum(em_tag_cot_arr[timemode][hour])
+                if mood != 'all':
+                    tag_index = em_tag.index(mood)
+                    res.append(em_tag_cot_arr[timemode][hour][tag_index])
+                else:
+                    res.append(em_tag_cot_arr[timemode][hour])
         except:
             raise Exception('No num_of_index')
-        return em_flag_cot, em_tag_cot, em_tag_cot_arr[timemode]
+        return em_flag_cot, em_tag_cot, res
 
     if method == 'vector':
         return vector
     elif method == 'value':
         return value
+
+
+def extract_area(wb_data):
+    """
+    提取地点信息
+    :param wb_data: 微博元数据
+    :return: 地点信息
+    """
+    location_list = []
+    re_str = '\[(?P<lat>\d.*), (?P<lng>\d.*)\]'  # lat纬度, lng经度
+    for wb in wb_data:
+        r = re.search(re_str, wb)
+        lat = eval(r.group('lat'))
+        lng = eval(r.group('lng'))
+        location_list.append((lat, lng))
+    return location_list
 
 
 def main():
@@ -314,13 +342,16 @@ def main():
     filteredwords = clean(wb_data, sw_data)
     # print(filteredwords == splitwords)
     # print(filteredwords)
-    wb_value_tag = emotion_tagging(wb_data, 'value')
-    wb_vector_tag = emotion_tagging(wb_data, 'vector')
+    # wb_value_tag = emotion_tagging(wb_data, 'value')
+    # wb_vector_tag = emotion_tagging(wb_data, 'vector')
 
-    time_list = extract_time(wb_data)
-    # wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'joy', 0, 'vector')()
+    # time_list = extract_time(wb_data)
+    # wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'all', 0, 'vector')()
     # wb_value_flag_res, wb_value_tag_res, wb_value_hour_res = emotion_timemode(wb_value_tag, time_list, 'joy', 0, 'value')()
-    # print(wb_value_flag_res, wb_value_tag_res, wb_value_hour_res)
+    # print(wb_value_hour_res)
+
+    # location_list = extract_area(wb_data)
+    # print(location_list)
 
 
 if __name__ == "__main__":
