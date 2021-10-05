@@ -207,7 +207,7 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
     em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
     em_flag_cot = [0 for i in range(len(em_flag))]  # flag计数器
     em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
-    em_tag_cot = [0 for i in range(len(em_tag))]
+    em_tag_cot = np.zeros(len(em_tag))
     em_flag_cot_arr = [np.zeros(len(em_flag) * hour_num).reshape((hour_num, len(em_flag))),
                        np.zeros(len(em_flag) * 24).reshape((24, len(em_flag))),
                        np.zeros(len(em_flag) * 3).reshape((3, len(em_flag)))]  # 分别代表3种模式的计数器，3维数组
@@ -215,12 +215,13 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
                        np.zeros(len(em_tag) * 24).reshape((24, len(em_tag))),
                        np.zeros(len(em_tag) * 3).reshape((3, len(em_tag)))]
     em_vecnum_arr = [np.zeros(hour_num), np.zeros(24), np.zeros(3)]  # 每个模式下对应向量的计数器
+    em_tagnum = 0  # 计算非零的向量标签总数
 
     def vector():
-        nonlocal em_tag_cot, em_flag_cot
+        nonlocal em_tag_cot, em_flag_cot, em_tagnum
         for i in range(len(wbemo_tag)):
             # vector计量情绪，只有情绪比例;wbemo_tag是二维列表
-            em_tag_cot += np.array(i)
+            em_tag_cot += np.array(wbemo_tag[i])
             try:
                 if timemode == 0:
                     time_index = int((time_list[i] - start_tick) //3600)
@@ -229,14 +230,17 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
                 elif timemode == 2:
                     time_index = int((time_list[i] - start_tick) // (3600*24))
                 em_tag_cot_arr[timemode][time_index] += np.array(wbemo_tag[i])
-                em_vecnum_arr[timemode][time_index] += 1
+                if np.sum(wbemo_tag[i]) != 0:
+                    em_vecnum_arr[timemode][time_index] += 1
+                    em_tagnum += 1
             except NameError:
                 raise Exception('No time_index')
             except IndexError:
                 raise Exception('Wrong index')
-        em_tag_cot = np.array(em_tag_cot)/len(em_tag_cot)  # 总的情绪比例
-        # print(em_tag_cot_arr[timemode][48])
+        em_tag_cot = em_tag_cot / em_tagnum  # 总的情绪比例
+        # print(np.sum(em_tag_cot_arr[timemode]))
         # print(np.sum(em_vecnum_arr[timemode]))
+        # print(em_tagnum, em_tag_cot)
         try:
             if timemode == 0:
                 num_of_index = hour_num
@@ -248,7 +252,7 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
                 em_tag_cot_arr[timemode][hour] /= em_vecnum_arr[timemode][hour]
         except:
             raise Exception('No num_of_index')
-        return em_tag_cot_arr[timemode]
+        return em_tag_cot, em_tag_cot_arr[timemode]
 
     def value():
         pass
@@ -277,8 +281,8 @@ def main():
     wb_vector_tag = emotion_tagging(wb_data, 'vector')
 
     time_list = extract_time(wb_data)
-    wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'joy', 0, 'vector')()
-    print(wb_vector_hour_res)
+    wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'joy', 0, 'vector')()
+    # print(wb_vector_res)
 
 
 if __name__ == "__main__":
