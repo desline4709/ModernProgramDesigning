@@ -2,6 +2,7 @@ import jieba
 import re
 import numpy as np
 import time
+from geopy.distance import geodesic
 
 
 def load_data(path, mode=0):
@@ -328,6 +329,58 @@ def extract_area(wb_data):
     return location_list
 
 
+def emotion_location_distribute(wbemo_tag, area_list, mood, method):
+    """
+    传入标签列表和坐标列表并返回情绪比例随与中心点距离变化的趋势
+    :param wbemo_tag: 情绪标签列表
+    :param area_list: 坐标元组列表
+    :param mood: 指定的情绪
+    :param method: 情绪计量的方式
+    :return: 情绪比例随与中心点距离变化的趋势
+    """
+    # 经考察，本微博数据的地点范围主要在北京市范围内，因此以北京市的故宫博物院的位置作为中心点
+    center_location = (39.924055, 116.403424) # 纬度，经度
+    dis_list = []
+    for i in range(len(wbemo_tag)):
+        dis = geodesic(center_location, area_list[i]).km
+        dis_list.append(dis)
+    max_dis = int(max(dis_list)) +1  # 最远距离
+    radium = [i for i in range(1, max_dis+1)]
+    em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
+    em_flag_cot_arr = np.zeros(max_dis * len(em_flag)).reshape(max_dis, len(em_flag))  # flag计数器
+    em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
+    em_tag_cot_arr = np.zeros(max_dis * len(em_tag)).reshape(max_dis, len(em_tag))
+    em_tag_num = np.zeros(max_dis)
+
+    def vector():
+        for i in range(len(wbemo_tag)):
+            for r in radium:
+                r_index = radium.index(r)
+                if dis_list[i] <= r:
+                    # 在半径为r范围内
+                    em_tag_cot_arr[r_index] += np.array(wbemo_tag[i])
+                    if np.sum(wbemo_tag[i]) != 0:
+                        em_tag_num[r_index] += 1
+        res = []
+        for i in range(len(radium)):
+            # print(em_tag_num)
+            em_tag_cot_arr[i] /= em_tag_num[i]
+            if mood != 'all':
+                tag_index = em_tag.index(mood)
+                res.append(em_tag_cot_arr[i][tag_index])
+            else:
+                res.append(em_tag_cot_arr[i])
+        return res
+
+    def value():
+        pass
+
+    if method == 'vector':
+        return vector
+    elif method == 'value':
+        return value
+
+
 def main():
     wb_data = load_data('weibo.txt')
 
@@ -343,15 +396,16 @@ def main():
     # print(filteredwords == splitwords)
     # print(filteredwords)
     # wb_value_tag = emotion_tagging(wb_data, 'value')
-    # wb_vector_tag = emotion_tagging(wb_data, 'vector')
+    wb_vector_tag = emotion_tagging(wb_data, 'vector')
 
     # time_list = extract_time(wb_data)
     # wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'all', 0, 'vector')()
     # wb_value_flag_res, wb_value_tag_res, wb_value_hour_res = emotion_timemode(wb_value_tag, time_list, 'joy', 0, 'value')()
     # print(wb_value_hour_res)
 
-    # location_list = extract_area(wb_data)
-    # print(location_list)
+    location_list = extract_area(wb_data)
+    wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'all', 'vector')()
+    # print(wb_vector_locres)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6fc6bc87-5488-44e6-86c4-e08d11469d0e" name="更改" comment="本地文件更新">
+    <list default="true" id="6fc6bc87-5488-44e6-86c4-e08d11469d0e" name="更改" comment="完善emotion_timemode的value，增加extrac_area">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -89,7 +89,7 @@
       <workItem from="1633249920210" duration="10735000" />
       <workItem from="1633271773525" duration="1719000" />
       <workItem from="1633311195501" duration="27333000" />
-      <workItem from="1633396079476" duration="989000" />
+      <workItem from="1633396079476" duration="10446000" />
     </task>
     <task id="LOCAL-00001" summary="week3 init">
       <created>1633227874881</created>
@@ -203,7 +203,28 @@
       <option name="project" value="LOCAL" />
       <updated>1633352134757</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="完善emotion_timemode的vector">
+      <created>1633435184313</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1633435184313</updated>
+    </task>
+    <task id="LOCAL-00018" summary="完成emotion_timemode的value">
+      <created>1633436514678</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1633436514678</updated>
+    </task>
+    <task id="LOCAL-00019" summary="完善emotion_timemode的value，增加extrac_area">
+      <created>1633442461846</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1633442461846</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,9 +254,12 @@
     <MESSAGE value="增加extract_time,完善emotion_timemode的vector方法" />
     <MESSAGE value="配置文件更改" />
     <MESSAGE value="本地文件更新" />
-    <option name="LAST_COMMIT_MESSAGE" value="本地文件更新" />
+    <MESSAGE value="完善emotion_timemode的vector" />
+    <MESSAGE value="完成emotion_timemode的value" />
+    <MESSAGE value="完善emotion_timemode的value，增加extrac_area" />
+    <option name="LAST_COMMIT_MESSAGE" value="完善emotion_timemode的value，增加extrac_area" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/week3$main.coverage" NAME="main 覆盖结果" MODIFIED="1633396477519" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/week3$main.coverage" NAME="main 覆盖结果" MODIFIED="1633442351798" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
