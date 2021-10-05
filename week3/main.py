@@ -255,12 +255,49 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
         return em_tag_cot, em_tag_cot_arr[timemode]
 
     def value():
-        pass
+        nonlocal em_tag_cot, em_flag_cot, em_tagnum
+        for i in range(len(wbemo_tag)):
+            # value计量情绪，只有一个情绪标签;wbemo_tag是元组的列表，元组第0位是em_flag，第1位是em_tag
+            flag_index = em_flag.index(wbemo_tag[i][0])
+            em_flag_cot[flag_index] += 1
+            if wbemo_tag[i][1] != -1:
+                # 单一情绪
+                tag_index = em_tag.index(wbemo_tag[i][1])
+                em_tag_cot[tag_index] += 1
+                try:
+                    if timemode == 0:
+                        time_index = int((time_list[i] - start_tick) // 3600)
+                    elif timemode == 1:
+                        time_index = eval(time.strftime("%H", time.localtime(time_list[i])))
+                    elif timemode == 2:
+                        time_index = int((time_list[i] - start_tick) // (3600 * 24))
+                    em_tag_cot_arr[timemode][time_index][tag_index] += 1
+                    # if np.sum(wbemo_tag[i]) != 0:
+                    #     em_vecnum_arr[timemode][time_index] += 1
+                    #     em_tagnum += 1
+                except NameError:
+                    raise Exception('No time_index')
+                except IndexError:
+                    raise Exception('Wrong index')
+        em_tag_cot /= np.sum(em_tag_cot)  # 总的单一情绪的情绪比例
+        em_flag_cot /= np.sum(em_flag_cot)  # 总的情绪flag的比例
+        try:
+            if timemode == 0:
+                num_of_index = hour_num
+            elif timemode == 1:
+                num_of_index = 24
+            elif timemode == 2:
+                num_of_index = 3
+            for hour in range(num_of_index):
+                em_tag_cot_arr[timemode][hour] /= np.sum(em_tag_cot_arr[timemode][hour])
+        except:
+            raise Exception('No num_of_index')
+        return em_flag_cot, em_tag_cot, em_tag_cot_arr[timemode]
 
     if method == 'vector':
         return vector
     elif method == 'value':
-        value()
+        return value
 
 
 def main():
@@ -281,8 +318,9 @@ def main():
     wb_vector_tag = emotion_tagging(wb_data, 'vector')
 
     time_list = extract_time(wb_data)
-    wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'joy', 0, 'vector')()
-    # print(wb_vector_res)
+    # wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'joy', 0, 'vector')()
+    # wb_value_flag_res, wb_value_tag_res, wb_value_hour_res = emotion_timemode(wb_value_tag, time_list, 'joy', 0, 'value')()
+    # print(wb_value_flag_res, wb_value_tag_res, wb_value_hour_res)
 
 
 if __name__ == "__main__":
