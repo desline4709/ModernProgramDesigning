@@ -3,6 +3,9 @@ import re
 import numpy as np
 import time
 from geopy.distance import geodesic
+from matplotlib import pyplot as plt
+from matplotlib.font_manager import FontProperties
+FontProperties(fname=r'C:\Users\30266\AppData\Local\Microsoft\Windows\Fonts\字魂10号-歌以晓手迹行楷体（个人非商用版）.ttf')
 
 
 def load_data(path, mode=0):
@@ -169,9 +172,9 @@ def emotion_tagging(wb_data, method):
     :return: 返回情绪标记列表
     """
     res = []
-    em_tagging = emotion_analysing(method)
+    em_analysing = emotion_analysing(method)
     for i in wb_data:
-        tag = em_tagging(i)
+        tag = em_analysing(i)
         res.append(tag)
     return res
 
@@ -409,19 +412,30 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
         return value()
 
 
-def visualization(data, mood, mode):
+def visualization(data, mood, mode, method):
     """
     进行情绪时空间可视化
     :param data: 时间或空间分布数据
     :param mood: 指定情绪
     :param mode: 进行时间(--time)的可视化还是空间(--area)的可视化
+    :param method: value或vector
     :return: 无返回值
     """
     em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
     em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
 
     def time():
-        pass
+        if method == 'vector':
+            # data[0]是tag总比例的向量，data[1]是指定模式的tag比例向量的列表
+            # 总比例的饼图
+            plt.figure()
+            x = data[0]
+
+
+            pass
+        elif method == 'value':
+            # data[0]是flag总比例的向量，data[1]是tag总比例的向量，data[2]是指定模式的tag比例向量的列表
+            pass
 
     def area():
         pass
@@ -446,18 +460,18 @@ def main():
     filteredwords = clean(wb_data, sw_data)
     # print(filteredwords == splitwords)
     # print(filteredwords)
-    wb_value_tag = emotion_tagging(wb_data, 'value')
-    wb_vector_tag = emotion_tagging(wb_data, 'vector')
+    wb_value_tag = emotion_tagging(filteredwords, 'value')
+    wb_vector_tag = emotion_tagging(filteredwords, 'vector')
 
-    time_list = extract_time(wb_data)
-    wb_vector_time_res = emotion_time_distribute(wb_vector_tag, time_list, 'all', 0, 'vector')
-    wb_value_time_res = emotion_time_distribute(wb_value_tag, time_list, 'joy', 0, 'value')
+    # time_list = extract_time(wb_data)
+    # wb_vector_time_res = emotion_time_distribute(wb_vector_tag, time_list, 'all', 0, 'vector')
+    # wb_value_time_res = emotion_time_distribute(wb_value_tag, time_list, 'joy', 0, 'value')
     # print(wb_value_time_res[-1])
 
     location_list = extract_area(wb_data)
-    # wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'joy', 'vector')
+    wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'joy', 'vector')
     wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'joy', 'value')
-    print(type(wb_value_locres[0][0]))
+    print(wb_value_locres[0])
 
 
 if __name__ == "__main__":
