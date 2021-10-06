@@ -347,7 +347,7 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
     max_dis = int(max(dis_list)) +1  # 最远距离
     radium = [i for i in range(1, max_dis+1)]
     em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
-    em_flag_cot_arr = np.zeros(max_dis * len(em_flag)).reshape(max_dis, len(em_flag))  # flag计数器
+    em_flag_cot_arr = np.zeros(len(em_flag))  # flag计数器
     em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
     em_tag_cot_arr = np.zeros(max_dis * len(em_tag)).reshape(max_dis, len(em_tag))
     em_tag_num = np.zeros(max_dis)
@@ -373,7 +373,29 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
         return res
 
     def value():
-        pass
+        nonlocal em_flag_cot_arr
+        for i in range(len(wbemo_tag)):
+            for r in radium:
+                r_index = radium.index(r)
+                if dis_list[i] <= r:
+                    # 在半径为r范围内
+                    if wbemo_tag[i][1] != -1:
+                        # 单一情绪
+                        tag_index = em_tag.index(wbemo_tag[i][1])
+                        em_tag_cot_arr[r_index][tag_index] += 1
+            flag_index = em_flag.index(wbemo_tag[i][0])
+            em_flag_cot_arr[flag_index] += 1
+        em_flag_cot_arr /= np.sum(em_flag_cot_arr)
+        res = []
+        for i in range(len(radium)):
+            # print(em_tag_num)
+            em_tag_cot_arr[i] /= np.sum(em_tag_cot_arr[i])
+            if mood != 'all':
+                tag_index = em_tag.index(mood)
+                res.append(em_tag_cot_arr[i][tag_index])
+            else:
+                res.append(em_tag_cot_arr[i])
+        return em_flag_cot_arr, res
 
     if method == 'vector':
         return vector
@@ -395,7 +417,7 @@ def main():
     filteredwords = clean(wb_data, sw_data)
     # print(filteredwords == splitwords)
     # print(filteredwords)
-    # wb_value_tag = emotion_tagging(wb_data, 'value')
+    wb_value_tag = emotion_tagging(wb_data, 'value')
     wb_vector_tag = emotion_tagging(wb_data, 'vector')
 
     # time_list = extract_time(wb_data)
@@ -404,8 +426,9 @@ def main():
     # print(wb_value_hour_res)
 
     location_list = extract_area(wb_data)
-    wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'all', 'vector')()
-    # print(wb_vector_locres)
+    # wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'joy', 'vector')()
+    wb_value_flagres, wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'angry', 'value')()
+    print(wb_value_flagres, wb_value_locres)
 
 
 if __name__ == "__main__":
