@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6fc6bc87-5488-44e6-86c4-e08d11469d0e" name="更改" comment="add visulization's time.vector">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="6fc6bc87-5488-44e6-86c4-e08d11469d0e" name="更改" comment="complete visulization's time">
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -92,7 +91,7 @@
       <workItem from="1633396079476" duration="12349000" />
       <workItem from="1633480306978" duration="4356000" />
       <workItem from="1633508587344" duration="3162000" />
-      <workItem from="1633520578309" duration="6442000" />
+      <workItem from="1633520578309" duration="13648000" />
     </task>
     <task id="LOCAL-00001" summary="week3 init">
       <created>1633227874881</created>
@@ -255,7 +254,14 @@
       <option name="project" value="LOCAL" />
       <updated>1633511770211</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="complete visulization's time">
+      <created>1633527195428</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1633527195428</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -304,9 +310,10 @@
     <MESSAGE value="完成emotion_location_distribute, 完成value函数" />
     <MESSAGE value="将emotion_timemode改为emotion_time_distribute" />
     <MESSAGE value="add visulization's time.vector" />
-    <option name="LAST_COMMIT_MESSAGE" value="add visulization's time.vector" />
+    <MESSAGE value="complete visulization's time" />
+    <option name="LAST_COMMIT_MESSAGE" value="complete visulization's time" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/week3$main.coverage" NAME="main 覆盖结果" MODIFIED="1633526995217" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/week3$main.coverage" NAME="main 覆盖结果" MODIFIED="1633536495717" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

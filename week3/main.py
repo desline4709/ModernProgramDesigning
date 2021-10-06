@@ -425,122 +425,127 @@ def visualization(data, mood, mode, method):
     em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
     em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
 
+    def draw_pie(data, mode, title):
+        """
+        画饼图
+        :param data: 比例数据
+        :param mode: mode == 0,draw tag;elif mode ==1 draw flag
+        :param title: str，图片标题
+        """
+        plt.figure()
+        x = data
+        if mode == 0:
+            labels = em_tag
+        elif mode == 1:
+            labels = em_flag
+        plt.pie(x, labels=labels, autopct='%1.1f%%', shadow=True, startangle=-90)
+        plt.title(title)
+        plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1))
+        plt.savefig('{}.png'.format(title))
+        plt.show()
+
+    def draw_bar_and_plot(data, mode, method, title):
+        """
+        画柱状图和折线图
+        :param data: 序列数据
+        :param mode: mode ==0,draw bar only; elif mode ==1, draw bar and plot
+        :param method: method == 0, time; method == 1 area
+        :param title: str，图片标题
+        """
+        if mode == 0:
+            # 柱状图（所有情绪）
+            x = np.arange(len(data)) * 5
+            tick_label = []
+            y1 = []; y2 = []; y3 = []; y4 = []; y5 = []
+            cot = 0
+            for i in data:
+                y1.append(i[0]); y2.append(i[1]);y3.append(i[2])
+                y4.append(i[3]); y5.append(i[4])
+                if method == 0:
+                    tick_label.append("{}-{}h".format(cot, cot + 1))
+                elif method == 1:
+                    tick_label.append("≤{}km".format(cot + 1))
+                cot += 1
+            plt.figure(1, figsize=(40, 15))
+            bar_width = 0.8
+            plt.bar(x, y1, bar_width, label=em_tag[0])
+            plt.bar(x + bar_width, y2, bar_width, label=em_tag[1])
+            plt.bar(x + 2 * bar_width, y3, bar_width, label=em_tag[2])
+            plt.bar(x + 3 * bar_width, y4, bar_width, label=em_tag[3])
+            plt.bar(x + 4 * bar_width, y5, bar_width, label=em_tag[4])
+            plt.legend(loc='upper right')
+            plt.title(title)
+            plt.xticks(x + 4 * bar_width / 2, tick_label)
+            plt.savefig('{}.png'.format(title))
+            plt.show()
+        elif mode == 1:
+            x = np.arange(len(data))
+            y = data
+            tick_label = []
+            for i in range(len(data)):
+                tick_label.append('{}-{}h'.format(i, i + 1))
+            bar_width = 0.5
+            plt.figure(2, figsize=(40, 3))
+            plt.bar(x, y, bar_width, label=mood)
+            plt.legend(loc='upper right')
+            plt.title('{}'.format(title))
+            plt.xticks(x, tick_label)
+            plt.plot(x, y, 'r*-')
+            for i in range(len(x)):
+                plt.text(x[i], y[i] + 0.01, '{:.2f}'.format(y[i]))
+            plt.savefig('{}.png'.format(title))
+            plt.show()
+
     def time():
         nonlocal method
         if method == 'vector':
             # data[0]是tag总比例的向量，data[1]是指定模式的tag比例向量的列表
-            # 总比例的饼图
-            plt.figure()
-            x = data[0]
-            plt.pie(x, labels=em_tag, autopct='%1.1f%%', shadow=True, startangle=-90)
-            plt.title(u'总时间内向量法各情绪比例分布图')
-            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1))
-            # plt.savefig('总时间内向量法各情绪比例分布图.png')
-            # plt.show()
+            # tag总比例的饼图
+            draw_pie(data[0], 0, '总时间内向量法各情绪比例分布图')
             # 随时间分布的柱状图或折线图
             if mood == 'all':
                 # 柱状图（所有情绪）
-                x = np.arange(len(data[1]))*5
-                tick_label = []
-                y1 = []; y2 = []; y3 = []; y4 = []; y5 = []
-                cot = 0
-                for i in data[1]:
-                    y1.append(i[0]); y2.append(i[1]); y3.append(i[2])
-                    y4.append(i[3]); y5.append(i[4])
-                    tick_label.append("{}-{}h".format(cot, cot+1))
-                    cot+=1
-                plt.figure(2, figsize=(40, 15))
-                bar_width = 0.8
-                plt.bar(x, y1, bar_width, label=em_tag[0])
-                plt.bar(x + bar_width, y2, bar_width, label=em_tag[1])
-                plt.bar(x + 2*bar_width, y3, bar_width, label=em_tag[2])
-                plt.bar(x + 3*bar_width, y4, bar_width, label=em_tag[3])
-                plt.bar(x + 4*bar_width, y5, bar_width, label=em_tag[4])
-                plt.legend(loc='upper right')
-                plt.title('向量法情绪比例随时间变化趋势')
-                plt.xticks(x + 4*bar_width/2, tick_label)
-                # plt.savefig('向量法情绪比例随时间变化趋势图.png')
-                plt.show()
+                draw_bar_and_plot(data[1], mode=0, method=0, title='向量法情绪比例随时间变化趋势图')
             else:
                 # 柱状图+折线图
-                x = np.arange(len(data[1]))
-                y = data[1]
-                tick_label = []
-                for i in range(len(data[1])):
-                    tick_label.append('{}-{}h'.format(i, i+1))
-                bar_width = 0.5
-                plt.figure(2, figsize=(40,3))
-                plt.bar(x, y, bar_width, label=mood)
-                plt.legend(loc='upper right')
-                plt.title('向量法{}情绪比例随时间变化趋势'.format(mood))
-                plt.xticks(x, tick_label)
-                plt.plot(x, y, 'r*-')
-                for i in range(len(x)):
-                    plt.text(x[i], y[i]+0.05, '{:.2f}'.format(y[i]))
-                plt.savefig('向量法{}情绪比例随时间变化趋势图.png'.format(mood))
-                plt.show()
+                draw_bar_and_plot(data[1], mode=1, method=0, title='向量法{}情绪比例随时间变化趋势'.format(mood))
 
         elif method == 'value':
             # data[0]是flag总比例的向量，data[1]是tag总比例的向量，data[2]是指定模式的tag比例向量的列表
             # tag总饼图
-            plt.figure()
-            x = data[1]
-            plt.pie(x, labels=em_tag, autopct='%1.1f%%', shadow=True, startangle=-90)
-            plt.title(u'总时间内主情绪法各情绪比例分布图')
-            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1))
-            plt.savefig('总时间内主情绪法各情绪比例分布图.png')
+            draw_pie(data[1], 0, '总时间内主情绪法各情绪比例分布图')
             # flag总饼图
-            plt.figure(2)
-            x = data[0]
-            plt.pie(x, labels=em_flag, autopct='%1.1f%%', shadow=True, startangle=-90)
-            plt.title(u'总时间内主情绪法各情绪分类比例图')
-            plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1))
-            plt.savefig('总时间内主情绪法各情绪分类比例图.png')
-            # plt.show()
+            draw_pie(data[0], 1, '总时间内主情绪法各情绪分类比例图')
             if mood == 'all':
                 # 柱状图（所有情绪）
-                x = np.arange(len(data[2])) * 5
-                tick_label = []
-                y1 = []; y2 = []; y3 = []; y4 = []; y5 = []
-                cot = 0
-                for i in data[2]:
-                    y1.append(i[0]); y2.append(i[1]); y3.append(i[2])
-                    y4.append(i[3]); y5.append(i[4])
-                    tick_label.append("{}-{}h".format(cot, cot + 1))
-                    cot += 1
-                plt.figure(3, figsize=(40, 15))
-                bar_width = 0.8
-                plt.bar(x, y1, bar_width, label=em_tag[0])
-                plt.bar(x + bar_width, y2, bar_width, label=em_tag[1])
-                plt.bar(x + 2 * bar_width, y3, bar_width, label=em_tag[2])
-                plt.bar(x + 3 * bar_width, y4, bar_width, label=em_tag[3])
-                plt.bar(x + 4 * bar_width, y5, bar_width, label=em_tag[4])
-                plt.legend(loc='upper right')
-                plt.title('主情绪法情绪比例随时间变化趋势')
-                plt.xticks(x + 4 * bar_width / 2, tick_label)
-                plt.savefig('主情绪法情绪比例随时间变化趋势.png')
-                plt.show()
+                draw_bar_and_plot(data[2], mode=0, method=0, title='主情绪法情绪比例随时间变化趋势')
             else:
                 # 柱状图+折线图
-                x = np.arange(len(data[2]))
-                y = data[2]
-                tick_label = []
-                for i in range(len(data[2])):
-                    tick_label.append('{}-{}h'.format(i, i + 1))
-                bar_width = 0.5
-                plt.figure(3, figsize=(40, 3))
-                plt.bar(x, y, bar_width, label=mood)
-                plt.legend(loc='upper right')
-                plt.title('主情绪法{}情绪比例随时间变化趋势'.format(mood))
-                plt.xticks(x, tick_label)
-                plt.plot(x, y, 'r*-')
-                for i in range(len(x)):
-                    plt.text(x[i], y[i] + 0.05, '{:.2f}'.format(y[i]))
-                plt.savefig('主情绪法{}情绪比例随时间变化趋势图.png'.format(mood))
-                plt.show()
+                draw_bar_and_plot(data[2], mode=1, method=0, title='主情绪法{}情绪比例随时间变化趋势'.format(mood))
 
     def area():
-        pass
+        nonlocal method
+        if method == 'vector':
+            # data是情绪变量随半径变化的列表
+            if mood == 'all':
+                # data[-1]是全空间范围内情绪比例
+                # tag总比例饼图
+                draw_pie(data[-1], mode=0, title='总空间范围内向量法各情绪比例分布图')
+                # 多个柱状图
+                draw_bar_and_plot(data, mode=0, method=1, title='向量法情绪比例随半径变化趋势')
+            else:
+                # 柱状图+折线图
+                draw_bar_and_plot(data, mode=1, method=1, title='向量法{}情绪比例随半径变化趋势'.format(mood))
+        elif method == 'value':
+            # data[0]是情绪变量随半径变化的列表，data[1]是大情绪的总空间范围内的比例
+            draw_pie(data[1], mode=1, title='总空间范围内主情绪法各情绪种类分布图')
+            if mood == 'all':
+                # data[0][-1]是情绪变量在全空间范围内的比例
+                draw_pie(data[0][-1], mode=0, title='总空间范围内主情绪法各情绪比例图')
+                draw_bar_and_plot(data[0], mode=0, method=1, title='主情绪法情绪比例随半径变化趋势')
+            else:
+                draw_bar_and_plot(data[0], mode=1, method=1, title='主情绪法{}情绪比例随半径变化趋势'.format(mood))
+
 
     if mode =='time':
         time()
@@ -566,16 +571,17 @@ def main():
     wb_vector_tag = emotion_tagging(filteredwords, 'vector')
 
     time_list = extract_time(wb_data)
-    wb_vector_time_res = emotion_time_distribute(wb_vector_tag, time_list, 'joy', 1, 'vector')
-    wb_value_time_res = emotion_time_distribute(wb_value_tag, time_list, 'joy', 0, 'value')
+    wb_vector_time_res = emotion_time_distribute(wb_vector_tag, time_list, 'joy', 0, 'vector')
+    wb_value_time_res = emotion_time_distribute(wb_value_tag, time_list, 'fear', 0, 'value')
     # print(wb_value_time_res[-1])
 
-    # location_list = extract_area(wb_data)
-    # wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'joy', 'vector')
-    # wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'joy', 'value')
+    location_list = extract_area(wb_data)
+    wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'angry', 'vector')
+    wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'disgusting', 'value')
     # print(wb_value_locres[0])
 
-    visualization(wb_value_time_res, mood='joy', mode='time', method='value')
+    # visualization(wb_value_time_res, mood='fear', mode='time', method='value')
+    visualization(wb_value_locres, mood='disgusting', mode='area', method='value')
 
 
 if __name__ == "__main__":
