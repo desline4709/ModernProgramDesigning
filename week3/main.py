@@ -190,7 +190,7 @@ def extract_time(wb_data):
     return timetick_list
 
 
-def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
+def emotion_time_distribute(wbemo_tag, time_list, mood, timemode, method):
     """
     传入标签列表并制定返回模式，返回对应情绪的指定模式，经分析，微博数据时间分布从2013.10.11零点-2013.10.13零点共两天的时间
     :param wbemo_tag:微博情绪标签列表
@@ -259,7 +259,7 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
         except:
             raise Exception('No num_of_index')
 
-        return em_tag_cot, res
+        return [em_tag_cot, res]
 
     def value():
         nonlocal em_tag_cot, em_flag_cot, em_tagnum
@@ -305,12 +305,12 @@ def emotion_timemode(wbemo_tag, time_list, mood, timemode, method):
                     res.append(em_tag_cot_arr[timemode][hour])
         except:
             raise Exception('No num_of_index')
-        return em_flag_cot, em_tag_cot, res
+        return [em_flag_cot, em_tag_cot, res]
 
     if method == 'vector':
-        return vector
+        return vector()
     elif method == 'value':
-        return value
+        return value()
 
 
 def extract_area(wb_data):
@@ -353,6 +353,9 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
     em_tag_num = np.zeros(max_dis)
 
     def vector():
+        """
+        :return: 情绪随半径的变化
+        """
         for i in range(len(wbemo_tag)):
             for r in radium:
                 r_index = radium.index(r)
@@ -373,6 +376,9 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
         return res
 
     def value():
+        """
+        :return: [情绪随半径的变化，flag的总比例向量]
+        """
         nonlocal em_flag_cot_arr
         for i in range(len(wbemo_tag)):
             for r in radium:
@@ -395,12 +401,35 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
                 res.append(em_tag_cot_arr[i][tag_index])
             else:
                 res.append(em_tag_cot_arr[i])
-        return em_flag_cot_arr, res
+        return [res, em_flag_cot_arr]
 
     if method == 'vector':
-        return vector
+        return vector()
     elif method == 'value':
-        return value
+        return value()
+
+
+def visualization(data, mood, mode):
+    """
+    进行情绪时空间可视化
+    :param data: 时间或空间分布数据
+    :param mood: 指定情绪
+    :param mode: 进行时间(--time)的可视化还是空间(--area)的可视化
+    :return: 无返回值
+    """
+    em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
+    em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
+
+    def time():
+        pass
+
+    def area():
+        pass
+
+    if mode =='time':
+        time()
+    elif mode == 'area':
+        area()
 
 
 def main():
@@ -420,15 +449,15 @@ def main():
     wb_value_tag = emotion_tagging(wb_data, 'value')
     wb_vector_tag = emotion_tagging(wb_data, 'vector')
 
-    # time_list = extract_time(wb_data)
-    # wb_vector_res, wb_vector_hour_res = emotion_timemode(wb_vector_tag, time_list, 'all', 0, 'vector')()
-    # wb_value_flag_res, wb_value_tag_res, wb_value_hour_res = emotion_timemode(wb_value_tag, time_list, 'joy', 0, 'value')()
-    # print(wb_value_hour_res)
+    time_list = extract_time(wb_data)
+    wb_vector_time_res = emotion_time_distribute(wb_vector_tag, time_list, 'all', 0, 'vector')
+    wb_value_time_res = emotion_time_distribute(wb_value_tag, time_list, 'joy', 0, 'value')
+    # print(wb_value_time_res[-1])
 
     location_list = extract_area(wb_data)
-    # wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'joy', 'vector')()
-    wb_value_flagres, wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'angry', 'value')()
-    print(wb_value_flagres, wb_value_locres)
+    # wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'joy', 'vector')
+    wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'joy', 'value')
+    print(type(wb_value_locres[0][0]))
 
 
 if __name__ == "__main__":
