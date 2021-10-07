@@ -1,1 +1,35 @@
-# -
+# <center>BUAA SEM ModernProgramDesigning Course 2021</center>
+
+## Intro
+
+This repository is going to save all the codefiles and using datas, homework file and datas will be meantained until the end of the course.
+
+# Attention
+
+Since the course has completed, the repo will no longer be meantained.
+
+## Content
+
+<table>
+	<tr>
+        <th>Week No.</th>
+        <th>Topic</th>
+        <th>Homework</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Hello Python</td>
+        <td>Just Install Modules</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Review Python</td>
+        <td><a href='https://github.com/desline4709/ModernProgramDesigning/tree/main/week2'>Text Analysis</a></td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Review Python</td>
+        <td><a href='https://github.com/desline4709/ModernProgramDesigning/tree/main/week3'>Emotion Analysis</a></td>
+    </tr>
+</table>
+
