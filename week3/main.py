@@ -312,9 +312,9 @@ def emotion_time_distribute(wbemo_tag, time_list, mood, timemode, method):
         return [em_flag_cot, em_tag_cot, res]
 
     if method == 'vector':
-        return vector()
+        return vector
     elif method == 'value':
-        return value()
+        return value
 
 
 def extract_area(wb_data):
@@ -408,9 +408,9 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
         return [res, em_flag_cot_arr]
 
     if method == 'vector':
-        return vector()
+        return vector
     elif method == 'value':
-        return value()
+        return value
 
 
 def visualization(data, mood, mode, method):
@@ -483,7 +483,10 @@ def visualization(data, mood, mode, method):
             y = data
             tick_label = []
             for i in range(len(data)):
-                tick_label.append('{}-{}h'.format(i, i + 1))
+                if method == 0:
+                    tick_label.append("{}-{}h".format(i, i + 1))
+                elif method == 1:
+                    tick_label.append("≤{}km".format(i + 1))
             bar_width = 0.5
             plt.figure(2, figsize=(40, 3))
             plt.bar(x, y, bar_width, label=mood)
@@ -553,6 +556,46 @@ def visualization(data, mood, mode, method):
         area()
 
 
+def time_variation(wb_data, filteredwords, mood, mode, method, plt):
+    """
+    进行情绪随时间变化趋势的分析
+    :param wb_data: 微博元数据
+    :param filteredwords: 微博分词数据
+    :param mood: 指定情绪：'angry' 'disgusting' 'fear' 'joy' 'sad' 'all'
+    :param mode: 控制返回时间的模式，包括小时(hour--0)、固定时段(fixed--1)、天(day--2)等
+    :param method: 情绪计量的方式 'vector'或'value'
+    :param plt: 是否画图，True or False
+    :return:
+    """
+    time_list = extract_time(wb_data)
+    wbemo_tag = emotion_tagging(filteredwords, method)
+    time_analysis = emotion_time_distribute(wbemo_tag, time_list, mood, timemode=mode, method=method)
+    result = time_analysis()
+    if plt:
+        # 画图
+        visualization(result, mood, mode='time', method=method)
+    return result
+
+
+def area_variation(wb_data, filteredwords, mood, method, plt):
+    """
+    进行情绪随空间变化的分析
+    :param wb_data: 微博元数据
+    :param filteredwords: 微博分词数据
+    :param mood: 指定情绪：'angry' 'disgusting' 'fear' 'joy' 'sad' 'all'
+    :param method: 情绪计量的方式 'vector'或'value'
+    :param plt: 是否画图，True or False
+    :return:
+    """
+    location_list = extract_area(wb_data)
+    wbemo_tag = emotion_tagging(filteredwords, method)
+    area_analysis = emotion_location_distribute(wbemo_tag, location_list, mood, method)
+    result = area_analysis()
+    if plt:
+        visualization(result, mood, 'area', method)
+    return result
+
+
 def main():
     wb_data = load_data('weibo.txt')
 
@@ -565,23 +608,16 @@ def main():
         sw_data += ['\t']
 
     filteredwords = clean(wb_data, sw_data)
-    # print(filteredwords == splitwords)
-    # print(filteredwords)
-    wb_value_tag = emotion_tagging(filteredwords, 'value')
-    wb_vector_tag = emotion_tagging(filteredwords, 'vector')
+    # wb_value_tag = emotion_tagging(filteredwords, 'value')
+    # wb_vector_tag = emotion_tagging(filteredwords, 'vector')
 
-    time_list = extract_time(wb_data)
-    wb_vector_time_res = emotion_time_distribute(wb_vector_tag, time_list, 'joy', 0, 'vector')
-    wb_value_time_res = emotion_time_distribute(wb_value_tag, time_list, 'fear', 0, 'value')
-    # print(wb_value_time_res[-1])
+    # time_list = extract_time(wb_data)
+    x = time_variation(wb_data, filteredwords, 'all', 0, 'value', True)
+    # print(x[1])
 
-    location_list = extract_area(wb_data)
-    wb_vector_locres = emotion_location_distribute(wb_vector_tag, location_list, 'angry', 'vector')
-    wb_value_locres = emotion_location_distribute(wb_value_tag, location_list, 'disgusting', 'value')
-    # print(wb_value_locres[0])
-
-    # visualization(wb_value_time_res, mood='fear', mode='time', method='value')
-    visualization(wb_value_locres, mood='disgusting', mode='area', method='value')
+    # location_list = extract_area(wb_data)
+    y = area_variation(wb_data, filteredwords, 'fear', 'vector', True)
+    # print(y)
 
 
 if __name__ == "__main__":
