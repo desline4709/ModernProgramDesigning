@@ -413,18 +413,21 @@ def emotion_location_distribute(wbemo_tag, area_list, mood, method):
         return value
 
 
-def visualization(data, mood, mode, method):
+def visualization(data, mood, mode, method, timemode=None):
     """
     进行情绪时空间可视化
     :param data: 时间或空间分布数据
     :param mood: 指定情绪
     :param mode: 进行时间(--time)的可视化还是空间(--area)的可视化
+    :param timemode: 采用的时间模式hour--0 fixed--1 day--2
     :param method: value或vector
     :return: 无返回值
     """
     em_flag = ['single', 'mixed', 'plain']  # 单一情绪，多情绪混合，无显著情绪
     em_tag = ['angry', 'disgusting', 'fear', 'joy', 'sad']  # 详细的情绪标签
-
+    if timemode != None:
+        tm_list = ['hour', 'fixed', 'day']
+        tm = tm_list[timemode]
     def draw_pie(data, mode, title):
         """
         画饼图
@@ -511,7 +514,7 @@ def visualization(data, mood, mode, method):
                 draw_bar_and_plot(data[1], mode=0, method=0, title='向量法情绪比例随时间变化趋势图')
             else:
                 # 柱状图+折线图
-                draw_bar_and_plot(data[1], mode=1, method=0, title='向量法{}情绪比例随时间变化趋势'.format(mood))
+                draw_bar_and_plot(data[1], mode=1, method=0, title='{}模式下向量法{}情绪比例随时间变化趋势'.format(tm, mood))
 
         elif method == 'value':
             # data[0]是flag总比例的向量，data[1]是tag总比例的向量，data[2]是指定模式的tag比例向量的列表
@@ -524,7 +527,7 @@ def visualization(data, mood, mode, method):
                 draw_bar_and_plot(data[2], mode=0, method=0, title='主情绪法情绪比例随时间变化趋势')
             else:
                 # 柱状图+折线图
-                draw_bar_and_plot(data[2], mode=1, method=0, title='主情绪法{}情绪比例随时间变化趋势'.format(mood))
+                draw_bar_and_plot(data[2], mode=1, method=0, title='{}模式下主情绪法{}情绪比例随时间变化趋势'.format(tm, mood))
 
     def area():
         nonlocal method
@@ -573,7 +576,7 @@ def time_variation(wb_data, filteredwords, mood, mode, method, plt):
     result = time_analysis()
     if plt:
         # 画图
-        visualization(result, mood, mode='time', method=method)
+        visualization(result, mood, mode='time', method=method, timemode=mode)
     return result
 
 
@@ -612,11 +615,11 @@ def main():
     # wb_vector_tag = emotion_tagging(filteredwords, 'vector')
 
     # time_list = extract_time(wb_data)
-    x = time_variation(wb_data, filteredwords, 'all', 0, 'value', True)
+    x = time_variation(wb_data, filteredwords, 'angry', 2, 'value', True)
     # print(x[1])
 
     # location_list = extract_area(wb_data)
-    y = area_variation(wb_data, filteredwords, 'fear', 'vector', True)
+    # y = area_variation(wb_data, filteredwords, 'fear', 'vector', False)
     # print(y)
 
 
