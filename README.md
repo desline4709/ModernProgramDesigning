@@ -32,7 +32,7 @@ Since the course has completed, the repo will no longer be meantained.
         <td><a href='https://github.com/desline4709/ModernProgramDesigning/tree/main/week3'>Emotion Analysis</a></td>
     </tr>
     <tr>
-        <td>4</td
+        <td>4</td>
         <td>No Class</td>
         <td>National Day</td>
     </tr>
