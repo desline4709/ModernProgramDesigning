@@ -615,12 +615,12 @@ def main():
     # wb_vector_tag = emotion_tagging(filteredwords, 'vector')
 
     # time_list = extract_time(wb_data)
-    x = time_variation(wb_data, filteredwords, 'angry', 2, 'value', True)
-    # print(x[1])
+    # x = time_variation(wb_data, filteredwords, 'angry', 0, 'value', False)
+    # print(x[-1])
 
     # location_list = extract_area(wb_data)
-    # y = area_variation(wb_data, filteredwords, 'fear', 'vector', False)
-    # print(y)
+    y = area_variation(wb_data, filteredwords, 'fear', 'vector', False)
+    print(y)
 
 
 if __name__ == "__main__":

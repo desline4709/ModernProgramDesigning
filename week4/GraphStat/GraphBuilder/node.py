@@ -1,10 +1,10 @@
 def init_node(path):
     """
     Return node list from node file
-    :Param path: file path
-    :Return: node list
+    :param path: file path
+    :return: node list
     """
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='utf-8') as f:
         fstr = f.read()
     
     index = fstr.find('*Edges')
