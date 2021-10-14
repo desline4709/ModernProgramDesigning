@@ -1,6 +1,7 @@
 from GraphStat.GraphBuilder import graph as gh
 from GraphStat.GraphBuilder import stat
 from GraphStat.Visualization import plotgraph
+from GraphStat.Visualization import plotnodes
 
 
 Graph = gh.init_graph('newmovies.txt')
@@ -10,4 +11,5 @@ Graph = gh.init_graph('newmovies.txt')
 # print(Graph1['NodeList'][-1])
 # x = stat.cal_average_degree(Graph)
 # res = stat.cal_attr_distribute(Graph, 'Node Class')
-plotgraph.plot_degree_distribution(Graph)
+# plotgraph.plot_degree_distribution(Graph)
+plotnodes.plot_nodes_attr(Graph, "Node Class")
