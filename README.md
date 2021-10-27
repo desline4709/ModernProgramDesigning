@@ -46,5 +46,10 @@ Since the course has completed, the repo will no longer be meantained.
         <td>Class</td>
         <td><a href="https://github.com/desline4709/ModernProgramDesigning/tree/main/week6">Class Design</a></td>
     </tr>
+    <tr>
+        <td>7</td>
+        <td>Class Inheritance</td>
+        <td><a href='https://github.com/desline4709/ModernProgramDesigning/tree/main/week7'>Image Handling</a></td>
+    </tr>
 </table>
 
