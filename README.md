@@ -51,5 +51,14 @@ Since the course has completed, the repo will no longer be meantained.
         <td>Class Inheritance</td>
         <td><a href='https://github.com/desline4709/ModernProgramDesigning/tree/main/week7'>Image Handling</a></td>
     </tr>
+    <tr>
+        <td>8</td>
+        <td>Exception Handling</td>
+        <td><a href="https://github.com/desline4709/ModernProgramDesigning/tree/main/week8">Excel Analysis</a></td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>Decorator</td>
+        <td><a href="https://github.com/desline4709/ModernProgramDesigning/tree/main/week9">Decorator Designing</a></td>
+    </tr>
 </table>
-
