@@ -54,7 +54,35 @@ class WasteBase:
 
 
 class Waste(WasteBase):
-    def __init__(self)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def generate_big_data(self):
+        """
+        创建大型数据
+        :return:
+        """
+        print('创建数据量为{}的数据'.format(self.size))
+        self._data = []
+        for i in range(self.size):
+            self._data.append(self.faker.name())
+        print('创建完成')
+
+    def pickle_data(self, filepath, is_raleative_path):
+        """
+        大型数据的序列化
+        :param filepath: 文件路径
+        :param is_raleative_path: 是否为相对路径
+        :return:
+        """
+        if is_raleative_path:
+            filepath = self.path + filepath
+        with open(filepath, 'wb') as f:
+            pkl.dump(self._data, f)
+        print('序列化完成')
+
+
+
 
 
 if __name__ == '__main__':
