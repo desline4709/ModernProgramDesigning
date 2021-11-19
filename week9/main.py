@@ -165,10 +165,32 @@ class Decorator:
         return decorator
 
 
+class WasteProxy(Waste):
+    def generate_big_data(self):
+        print('创建数据量为{}的数据'.format(self.size))
+        self._data = []
+        for i in tqdm(range(self.size)):
+            self._data.append(self.faker.name())
+        print('创建完成')
 
+    @mp.profile
+    def pickle_data(self, filename, is_raleative_path):
+        if is_raleative_path:
+            filepath = self.path + filepath
+        with open(filepath, 'wb') as f:
+            pkl.dump(self._data, f)
+        print('序列化完成')
+    
 
+    
+
+class Test:
+    def __init__(self, WasteProxy):
+        self.wp = WasteProxy
+    
+    def test_tqdm(self):
+        pass
 
 
 if __name__ == '__main__':
-
-
+    pass
