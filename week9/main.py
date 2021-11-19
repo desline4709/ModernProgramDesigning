@@ -1,9 +1,15 @@
-from tqdm import tqdm
-import line_profiler as lp
-import memory_profiler as mp
+import os
+import sys
 import time
+import inspect
 import pickle as pkl
+from tqdm import tqdm
 from faker import Faker
+import line_profiler as lp
+from functools import wraps
+import memory_profiler as mp
+from playsound import playsound
+
 
 
 class WasteBase:
@@ -82,10 +88,87 @@ class Waste(WasteBase):
         print('序列化完成')
 
 
+class Decorator:
+    """
+    对浪费时间、空间的操作的类进行装饰的类
+    """
+    def show_runtime(self, func):
+        """
+        :param func: 被装饰的函数
+        :return: 装饰器
+        """
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            res = func(*args, **kwargs)
+            end = time.time()
+            print('function {} has ron for {} seconds'.format(func.__name__, end - start))
+            return res
+
+        return wrapper
+
+    def show_lineinfo(self, func):
+        """
+        逐行分析代码运行耗时
+        :param func: 需要分析的函数
+        :return: 装饰器
+        """
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            profile = lp.LineProfiler(func)  # 将函数传递到分析器
+            profile.enable()  # 开始分析
+            res = func(*args, **kwargs)
+            profile.disable()  # 停止分析
+            profile.print_stats(sys.stdout)  # 打印出性能分析结果
+            return res
+
+        return wrapper
+
+    def check_path(self, func):
+        """
+        检查函数中的路径是否正确
+        :param path: 路径参数的名称
+        :return: 装饰器
+        """
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            pathflag = kwargs.get('filepath', False)
+            if not pathflag:
+                # 这个路径参数不存在
+                raise Exception("No path parameter \'filepath\'")
+            # 下面检查路径本身是否存在
+            path_value = kwargs['filepath']
+            os_path_list = os.listdir()
+            if path_value not in os_path_list:
+                # 需要新建文件夹
+                print('文件夹{}不存在，下面开始创建...'.format(path_value))
+                os.mkdirs(path_value)
+            res = func(*args, **kwargs)
+            return res
+
+        return wrapper
+
+    def play_sound_after_incident(self, soundpath):
+        """
+        在某个事件完成后播放声音进行提示
+        :param soundpath: 声音文件的路径
+        :return: 装饰器
+        """
+        def decorator(func):  # 高阶函数
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                res = func(*args, **kwargs)
+                print('事件已发生！播放声音进行提示...')
+                playsound('music/sound1.mp3')
+                return res
+            return wrapper
+        return decorator
+
+
+
 
 
 
 if __name__ == '__main__':
-
 
 
