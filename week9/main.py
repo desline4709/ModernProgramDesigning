@@ -92,7 +92,8 @@ class Decorator:
     """
     对浪费时间、空间的操作的类进行装饰的类
     """
-    def show_runtime(self, func):
+    @staticmethod
+    def show_runtime(func):
         """
         :param func: 被装饰的函数
         :return: 装饰器
@@ -107,7 +108,8 @@ class Decorator:
 
         return wrapper
 
-    def show_lineinfo(self, func):
+    @staticmethod
+    def show_lineinfo(func):
         """
         逐行分析代码运行耗时
         :param func: 需要分析的函数
@@ -124,7 +126,8 @@ class Decorator:
 
         return wrapper
 
-    def check_path(self, func):
+    @staticmethod
+    def check_path(func):
         """
         检查函数中的路径是否正确
         :param path: 路径参数的名称
@@ -148,7 +151,8 @@ class Decorator:
 
         return wrapper
 
-    def play_sound_after_incident(self, soundpath):
+    @staticmethod
+    def play_sound_after_incident(soundpath):
         """
         在某个事件完成后播放声音进行提示
         :param soundpath: 声音文件的路径
@@ -159,13 +163,15 @@ class Decorator:
             def wrapper(*args, **kwargs):
                 res = func(*args, **kwargs)
                 print('事件已发生！播放声音进行提示...')
-                playsound('music/sound1.mp3')
+                playsound(soundpath)
                 return res
             return wrapper
         return decorator
 
 
 class WasteProxy(Waste):
+    @Decorator.show_runtime
+    @Decorator.show_lineinfo
     def generate_big_data(self):
         print('创建数据量为{}的数据'.format(self.size))
         self._data = []
@@ -173,6 +179,8 @@ class WasteProxy(Waste):
             self._data.append(self.faker.name())
         print('创建完成')
 
+    @Decorator.play_sound_after_incident('music/sound1')
+    @Decorator.check_path
     @mp.profile
     def pickle_data(self, filename, is_raleative_path):
         if is_raleative_path:
@@ -185,11 +193,12 @@ class WasteProxy(Waste):
     
 
 class Test:
-    def __init__(self, WasteProxy):
+    def __init__(self, WasteProxy: WasteProxy):
         self.wp = WasteProxy
     
-    def test_tqdm(self):
-        pass
+    def test(self):
+        self.wp.generate_big_data()
+        self.wp.pickle_data('data/data.pkl', is_raleative_path=True)
 
 
 if __name__ == '__main__':
