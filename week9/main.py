@@ -1,25 +1,26 @@
 import os
+import re
 import sys
 import time
-import inspect
 import pickle as pkl
 from tqdm import tqdm
 from faker import Faker
 import line_profiler as lp
 from functools import wraps
 import memory_profiler as mp
-from playsound import playsound
+from pydub import AudioSegment
+from pydub.playback import play
+
 
 
 
 class WasteBase:
     """
     Base class for do something to waste time
-    properties: size path faker
+    properties: size faker
     """
-    def __init__(self, size=1000000, path='data'):
+    def __init__(self, size=100000):
         self._size = size
-        self._path = path
         self._faker = Faker('zh_CN')
 
     @property
@@ -33,18 +34,6 @@ class WasteBase:
     @size.deleter
     def size(self):
         self._size = 0
-
-    @property
-    def path(self):
-        return self._path
-
-    @path.setter
-    def path(self, new_path):
-        self._path = new_path
-
-    @path.deleter
-    def path(self):
-        self._path = None
 
     @property
     def faker(self):
@@ -74,15 +63,13 @@ class Waste(WasteBase):
             self._data.append(self.faker.name())
         print('创建完成')
 
-    def pickle_data(self, filepath, is_raleative_path):
+    def pickle_data(self, filepath):
         """
         大型数据的序列化
         :param filepath: 文件路径
         :param is_raleative_path: 是否为相对路径
         :return:
         """
-        if is_raleative_path:
-            filepath = self.path + filepath
         with open(filepath, 'wb') as f:
             pkl.dump(self._data, f)
         print('序列化完成')
@@ -138,14 +125,14 @@ class Decorator:
             pathflag = kwargs.get('filepath', False)
             if not pathflag:
                 # 这个路径参数不存在
-                raise Exception("No path parameter \'filepath\'")
+                raise Exception("No path parameter 'filepath' ")
             # 下面检查路径本身是否存在
             path_value = kwargs['filepath']
-            os_path_list = os.listdir()
-            if path_value not in os_path_list:
+            file_dir = re.search('[A-Za-z0-9]*/?.*/', path_value).group(0)[:-1]
+            if not os.path.exists(file_dir):
                 # 需要新建文件夹
-                print('文件夹{}不存在，下面开始创建...'.format(path_value))
-                os.mkdirs(path_value)
+                print('文件夹{}不存在，下面开始创建...'.format(file_dir))
+                os.mkdir(file_dir)
             res = func(*args, **kwargs)
             return res
 
@@ -163,7 +150,8 @@ class Decorator:
             def wrapper(*args, **kwargs):
                 res = func(*args, **kwargs)
                 print('事件已发生！播放声音进行提示...')
-                playsound(soundpath)
+                song = AudioSegment.from_mp3(soundpath)
+                play(song)
                 return res
             return wrapper
         return decorator
@@ -179,17 +167,13 @@ class WasteProxy(Waste):
             self._data.append(self.faker.name())
         print('创建完成')
 
-    @Decorator.play_sound_after_incident('music/sound1')
+    @Decorator.play_sound_after_incident('music/sound1.mp3')
     @Decorator.check_path
     @mp.profile
-    def pickle_data(self, filename, is_raleative_path):
-        if is_raleative_path:
-            filepath = self.path + filepath
+    def pickle_data(self, filepath):
         with open(filepath, 'wb') as f:
             pkl.dump(self._data, f)
         print('序列化完成')
-    
-
     
 
 class Test:
@@ -198,8 +182,16 @@ class Test:
     
     def test(self):
         self.wp.generate_big_data()
-        self.wp.pickle_data('data/data.pkl', is_raleative_path=True)
+        self.wp.pickle_data(filepath='data/data.pkl')
+
+
+def main():
+    wp = WasteProxy()
+    t = Test(wp)
+    t.test()
 
 
 if __name__ == '__main__':
-    pass
+    main()
+    # song = AudioSegment.from_mp3('music/sound1.mp3')
+    # play(song)
