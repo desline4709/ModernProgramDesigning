@@ -143,8 +143,15 @@ def main():
     # Test RandomWalk
 
     test = RandomWalk(0, 0, 1, 5)
-    for i in test.walk():
-        print(i)
+    walk = test.walk()
+    # for i in walk:
+    #     print(i)
+    try:
+        while True:
+            print(next(walk))
+    except StopIteration as si:
+        print(si.value)
+
     print(test.params)
     '''
     '''
