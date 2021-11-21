@@ -60,15 +60,57 @@ class RandomWalk:
         return "参数如下：mu-{}, x_0-{}, sigma^2-{}, N-{}".format(self._mu, self._x_0, self._sigma2, self._N)
 
 
+class RandomWalks:
+    """
+    实现多个RandomWalk的合并
+    """
+    def __init__(self, length):
+        self._walk_list = []
+        self._length = length
+
+    def add_walk(self, rw: RandomWalk):
+        rw.N = self._length  # 长度对齐
+        walk = rw.walk()
+        self._walk_list.append(walk)
+
+    def walks(self):
+        return zip(self._walk_list)
+
+
+
+
+
 def main():
     '''
-    RandomWalk
+    # Test RandomWalk
 
     test = RandomWalk(0, 0, 1, 5)
     for i in test.walk():
         print(i)
     print(test.params)
     '''
+    '''
+    # Test RandomWalks
+    
+    rw1 = RandomWalk(0, 0, 1, 5)
+    rw2 = RandomWalk(1, 1, 1, 8)
+    rws = RandomWalks(10)
+    rws.add_walk(rw1)
+    rws.add_walk(rw2)
+    walks = list(rws.walks())
+    print(walks)
+    try:
+        while 1:
+            res = []
+            for walk in walks:
+                temp = next(walk[0])
+                res.append(temp)
+            print(res)
+    except StopIteration:
+        print('done')
+    '''
+
+
 
 
 if __name__ == "__main__":
