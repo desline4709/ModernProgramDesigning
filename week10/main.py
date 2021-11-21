@@ -1,4 +1,10 @@
+import os
 import numpy as np
+from PIL import Image
+
+
+class PathNotExistError(Exception):
+    pass
 
 
 class RandomWalk:
@@ -77,7 +83,59 @@ class RandomWalks:
         return zip(self._walk_list)
 
 
+class ImageIter:
+    def __init__(self, pic_dir):
+        """
+        :param pic_dir: 图片文件夹路径
+        """
+        self._pic_dir = pic_dir
+        self._pic_name_list = []
+        self._cot = 0
 
+    @property
+    def pic_dir(self):
+        return self._pic_dir
+
+    @pic_dir.setter
+    def pic_dir(self, new_dir):
+        self._pic_dir = new_dir
+
+    @pic_dir.deleter
+    def pic_dir(self):
+        self._pic_dir = None
+
+    def _check_path(self):
+        if not os.path.exists(self.pic_dir):
+            raise PathNotExistError
+
+    def _load_dir(self):
+        try:
+            self._check_path()
+        except PathNotExistError:
+            print("directory {} does not found".format(self.pic_dir))
+        else:
+            os.chdir(self.pic_dir)
+            self._pic_name_list = os.listdir()
+
+    def _digit_pic(self, image: Image):
+        res = np.array(image)
+        return res
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._cot == 0:
+            self._load_dir()
+        length = len(self._pic_name_list)
+        if self._cot < length:
+            path = self._pic_name_list[self._cot]
+            img = Image.open(path)
+            dig_img = self._digit_pic(img)
+            self._cot += 1
+            return dig_img
+        else:
+            raise StopIteration('所有图片遍历完成！')
 
 
 def main():
@@ -98,7 +156,6 @@ def main():
     rws.add_walk(rw1)
     rws.add_walk(rw2)
     walks = list(rws.walks())
-    print(walks)
     try:
         while 1:
             res = []
@@ -109,7 +166,17 @@ def main():
     except StopIteration:
         print('done')
     '''
-
+    imageiter = ImageIter('Pics/2002/07/19/big')
+    # for i in range(1):
+    #     print(next(imageiter))
+    try:
+        while 1:
+            next(imageiter)
+    except StopIteration as si:
+        print(si.value)
+    # for i in imageiter:
+    #     print("-"*30)
+    #     print(i)
 
 
 
