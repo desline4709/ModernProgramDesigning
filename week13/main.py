@@ -1,6 +1,7 @@
 import requests
 from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
+from bs4 import BeautifulSoup
 
 
 class Crawler(Thread):
@@ -16,7 +17,7 @@ class Crawler(Thread):
         global html
         if r.status_code == 200:
             # 状态正常
-            print(r.text)
+            # print(r.text)
             html.append(r.text)
 
 
@@ -26,7 +27,18 @@ class Parser(Thread):
         self._html = html
 
     def run(self):
-        print(self._html)
+       # print(self._html)
+        soup = BeautifulSoup(self._html)
+        playlist_htmls = soup.find_all(class_='u-cover u-cover-1')
+        playlist = []
+        for html in playlist_htmls:
+            soup_temp = BeautifulSoup(str(html))
+            # print(soup_temp)
+            playlist_id = soup_temp.select('a[class="icon-play f-fr"]')[0]['data-res-id']
+            playlist_url = "https://music.163.com/playlist?id=" + playlist_id
+            playlist.append((playlist_id,playlist_url))
+        print(playlist)
+
 
 
 if __name__ == '__main__':
