@@ -21,16 +21,24 @@ class Producer(Thread):
         self._q = q
 
     def crawler(self):
-        headers = {
+        headers1 = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
             "Referer": "https://music.163.com/",
             "Upgrade-Insecure-Requests": '1'}
-        r = requests.get(self._url, headers=headers, allow_redirects=False, verify=True)
+        headers2 = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36 Edg/96.0.1054.43"}
+        ran_int = random.random()
+        if ran_int <=0.5:
+            headers = headers1
+        else:
+            headers = headers2
+        # time.sleep(random.random() +1)
+        r = requests.get(self._url, headers=headers)
         if r.status_code == 200:
             # 状态正常
             # print(r.text)
             self._html = r.text
         else:
+            print(r.status_code)
             raise Exception("歌单页爬取错误！")
 
     def parser(self):
@@ -152,14 +160,22 @@ if __name__ == '__main__':
         plist.append(p)
         p.start()
     clist = []
-    for i in range(20):
+    for i in range(40):
         c = Consumer(q, mutex, i+1)
         clist.append(c)
         c.start()
     for p in plist:
         p.join()
-    for i in range(len(clist)):
-        q.put((None,None))
+
+    while 1:
+        time.sleep(3)
+        if q.empty():
+            for i in range(len(clist)):
+                time.sleep(2)
+                q.put((None,None))
+            break
+        else:
+            continue
 
     for c in clist:
         c.join()
