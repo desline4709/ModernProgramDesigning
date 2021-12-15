@@ -31,7 +31,7 @@ class Producer(Thread):
             headers = headers1
         else:
             headers = headers2
-        # time.sleep(random.random() +1)
+        # time.sleep(10)
         r = requests.get(self._url, headers=headers)
         if r.status_code == 200:
             # 状态正常
@@ -43,6 +43,8 @@ class Producer(Thread):
 
     def parser(self):
         soup = BeautifulSoup(self._html, "html.parser")
+        if "古风" not in soup.title.string:
+            print(self._url)
         playlist_htmls = soup.find_all(class_='u-cover u-cover-1')
         playlist = []
         for html in playlist_htmls:
@@ -150,7 +152,7 @@ class Consumer(Thread):
 
 if __name__ == '__main__':
     flag = 0
-    cat = "古风".encode('utf-8')
+    cat = "古风"
     url = ["https://music.163.com/discover/playlist/?order=hot&cat={}&limit=35&offset={}".format(cat, num*35) for num in range(38)]
     q = Queue()
     mutex = threading.Lock()
@@ -158,6 +160,7 @@ if __name__ == '__main__':
     for i in range(len(url)):
         p = Producer(url[i], q)
         plist.append(p)
+        time.sleep(random.random() + 1)
         p.start()
     clist = []
     for i in range(40):
